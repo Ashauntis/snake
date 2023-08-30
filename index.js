@@ -140,7 +140,7 @@ function animateGameOver() {
     ctx.textAlign = "center";
     ctx.fillText("GAME OVER!!!", canvas.width / 2, canvas.height / 2);
 
-    ctx.font = "15px PressStart2P";
+    ctx.font = "22px PressStart2P";
 
     ctx.fillText(
         "Score: " + player.score,
