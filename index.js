@@ -24,6 +24,7 @@ class Player {
         this.move_delay = 0.2;
         this.body_max_length = 4;
         this.score = 0;
+        this.difficulty = 0.5; // 1 is no speed up, 0.5 is double speed. maybe .9 or .95 is good?
     }
 
     move() {
@@ -57,7 +58,7 @@ class Player {
         // check for food
         if (this.position.x == food.x && this.position.y == food.y) {
             this.body_max_length += 4;
-            this.move_delay *= 0.9;
+            this.move_delay *= this.difficulty;
             this.score += 1;
             placeFood();
         }
@@ -72,8 +73,8 @@ class Player {
         for (var i = 0; i < this.body.length; i++) {
             if (this.position.x == this.body[i].x && this.position.y == this.body[i].y) {
                 death = true;
-            }   
-        }   
+            }
+        }
 
         if (death) {
             log("game over!");
@@ -135,24 +136,26 @@ function animate() {
 }
 
 function animateGameOver() {
-    ctx.font = "30px PressStart2P";
-    ctx.fillStyle = "white";
+    const base_font_size = canvas.block_size * 4;
+    ctx.font = base_font_size + "px PressStart2P";
+    ctx.fillStyle = "red";
     ctx.textAlign = "center";
-    ctx.fillText("GAME OVER!!!", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("You Died", canvas.width / 2, base_font_size * 2);
+    ctx.fillStyle = "white";
 
-    ctx.font = "22px PressStart2P";
+    ctx.font = Math.floor(base_font_size / 2) + "px PressStart2P";
 
     ctx.fillText(
         "Score: " + player.score,
         canvas.width / 2,
-        canvas.height / 2 + 40
+        base_font_size * 4
     );
 
 
     ctx.fillText(
         "Press [Enter] to Continue",
         canvas.width / 2,
-        canvas.height / 2 + 80
+        base_font_size * 6
     );
 
     if (last_key == "Enter") {
@@ -164,7 +167,7 @@ function animateGameOver() {
 }
 
 function offsetFillRect(x, y, w, h) {
-    
+
     let left_offset = Math.floor(canvas.width / 2 - canvas.block_size * 20);
 
     ctx.fillRect(left_offset + x, y, w, h);
