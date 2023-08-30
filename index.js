@@ -24,7 +24,7 @@ class Player {
         this.move_delay = 0.2;
         this.body_max_length = 4;
         this.score = 0;
-        this.difficulty = 0.5; // 1 is no speed up, 0.5 is double speed. maybe .9 or .95 is good?
+        this.difficulty = 0.9; // 1 is no speed up, 0.5 is double speed. maybe .9 or .95 is good?
     }
 
     move() {
