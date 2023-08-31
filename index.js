@@ -91,7 +91,7 @@ class Player {
             } else if (canvas.difficulty === 'medium') {
                 this.move_delay *= 0.9;
             } else if (canvas.difficulty === 'hard') {
-                this.move_delay *= 0.5;
+                this.move_delay *= 0.75;
             }
 
             this.score += 1;
