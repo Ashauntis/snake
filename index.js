@@ -122,6 +122,8 @@ scene = "title";
 last_key = "";
 frame_time = performance.now();
 time_current = hrTime();
+time_last = time_current;
+time_delta = 0;
 
 addEventListener("keydown", ({ key }) => {
     last_key = key;
@@ -158,6 +160,9 @@ addEventListener("keydown", ({ key }) => {
 function animate() {
     requestAnimationFrame(animate);
     time_current = hrTime();
+    time_delta = time_current - time_last;
+    time_last = time_current;
+
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -190,6 +195,15 @@ function animate() {
             animateGameOver();
             break;
     }
+
+    // draw the fps
+    ctx.font = "20px PressStart2P";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "left";
+    ctx.fillText("FPS: " + Math.floor(1 / time_delta), 10, canvas.height);
+    ctx.fillText("Score: " + player.score, 10, canvas.height - 20);
+    ctx.fillText("Move Speed: " + player.move_delay.toFixed(4), 10, canvas.height - 40);
+    ctx.fillText("Frame Time: " + time_delta.toFixed(4), 10, canvas.height - 60);
 }
 
 function animateGameOver() {
