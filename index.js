@@ -340,7 +340,7 @@ function fillAndStrokeText(text, x, y) {
 function animateTitle() {
 
     // draw the snake image in the center of the screen with a slight transparency
-    ctx.globalAlpha = 0.8;
+    ctx.globalAlpha = 0.2;
     ctx.drawImage(snakeimg, canvas.width / 2 - snakeimg.width / 2, canvas.height / 2 - snakeimg.height / 2);
     ctx.globalAlpha = 1;
 
