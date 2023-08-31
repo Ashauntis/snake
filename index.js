@@ -1,4 +1,5 @@
 debug = true;
+performance_metrics = false;
 
 function log(message) {
     if (debug) console.log(message);
@@ -129,9 +130,8 @@ addEventListener("keydown", ({ key }) => {
     last_key = key;
     log("Key pressed: " + key);
 
+    // check for movement keys and handle the input buffer
     valid_movement_keys = ["w", "a", "s", "d"];
-
-
     if (valid_movement_keys.includes(key)) {
         log("valid key pressed: " + key);
 
@@ -154,6 +154,11 @@ addEventListener("keydown", ({ key }) => {
                 log_input_buffer();
             }
         }
+    }
+
+    // toggle performance metrics
+    if (key == "p") {
+        performance_metrics = !performance_metrics;
     }
 });
 
@@ -196,14 +201,16 @@ function animate() {
             break;
     }
 
-    // draw the fps
-    ctx.font = "20px PressStart2P";
-    ctx.fillStyle = "red";
-    ctx.textAlign = "left";
-    ctx.fillText("FPS: " + Math.floor(1 / time_delta), 10, canvas.height);
-    ctx.fillText("Score: " + player.score, 10, canvas.height - 20);
-    ctx.fillText("Move Speed: " + player.move_delay.toFixed(4), 10, canvas.height - 40);
-    ctx.fillText("Frame Time: " + time_delta.toFixed(4), 10, canvas.height - 60);
+    // draw the performance metrics
+    if (performance_metrics) {
+        ctx.font = "20px PressStart2P";
+        ctx.fillStyle = "red";
+        ctx.textAlign = "left";
+        ctx.fillText("FPS: " + Math.floor(1 / time_delta), 10, canvas.height - 60);
+        ctx.fillText("Score: " + player.score, 10, canvas.height - 40);
+        ctx.fillText("Move Speed: " + player.move_delay.toFixed(4), 10, canvas.height - 20);
+        ctx.fillText("Frame Time: " + time_delta.toFixed(4), 10, canvas.height);
+    }
 }
 
 function animateGameOver() {
@@ -322,26 +329,67 @@ function animatePause() {
     }
 }
 
+function fillAndStrokeText(text, x, y) {
+    ctx.fillText(text, x, y);
+    ctx.strokeText(text, x, y);
+
+}
+
 function animateTitle() {
-    var font_size_title = 50;
-    var font_size_subtitle = 20;
+    ctx.drawImage(snakeimg, canvas.width / 2 - snakeimg.width / 2, canvas.height / 2 - snakeimg.height / 2);
+
+    var font_size_title = canvas.block_size * 4;
+    var font_size_subtitle = canvas.block_size * 2;
 
     ctx.font = font_size_title + "px PressStart2P";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.fillText("Snake", canvas.width / 2, font_size_title);
+    ctx.strokeStyle = "red";
+    fillAndStrokeText("Snake", canvas.width / 2, font_size_title + 4);
+
     ctx.font = font_size_subtitle + "px PressStart2P";
-    ctx.fillText(
-        "A Jack Games Production",
+    fillAndStrokeText(
+        "©️ 1975 Jack Games",
         canvas.width / 2,
-        font_size_title * 2,
+        font_size_title * 10,
     );
-    ctx.fillText(
-        "Press [Enter] to Start and Pause",
+
+    ctx.textAlign = "center";
+
+    fillAndStrokeText(
+        "Move",
         canvas.width / 2,
-        font_size_title * 3,
+        font_size_title * 3.25,
     );
-    ctx.drawImage(snakeimg, canvas.width / 2, 100);
+    fillAndStrokeText(
+        "[w,a,s,d]",
+        canvas.width / 2,
+        font_size_title * 4,
+    );
+
+    fillAndStrokeText(
+        "Start/Pause",
+        canvas.width / 2,
+        font_size_title * 5.25
+    );
+
+    fillAndStrokeText(
+        "[Enter]",
+        canvas.width / 2,
+        font_size_title * 6,
+    );
+    fillAndStrokeText(
+        "Toggle Data",
+        canvas.width / 2,
+        font_size_title * 7.25
+    );
+
+    fillAndStrokeText(
+        "[p]",
+        canvas.width / 2,
+        font_size_title * 8,
+    );
+
 
     if (last_key == "Enter") {
         placeFood();
