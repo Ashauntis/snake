@@ -14,24 +14,52 @@ function placeFood() {
     food.y = 1 + Math.floor(Math.random() * 38);
 }
 
+function log_input_buffer() {
+    log("input buffer: " + player.input_buffer);
+
+}
+
 class Player {
     constructor(position) {
         this.position = position;
         this.body = [];
         this.heading = "s";
-        this.last_heading = "s";
         this.time_last_move = hrTime();
         this.move_delay = 0.2;
         this.body_max_length = 4;
         this.score = 0;
         this.difficulty = 0.9; // 1 is no speed up, 0.5 is double speed. maybe .9 or .95 is good?
+        this.input_buffer = [];
+        this.input_buffer_max_length = 3;
     }
 
     move() {
-        // case heading
+        // check if enough time has passed to move
         if (time_current - this.last_move < this.move_delay) return;
-        this.last_heading = this.heading;
         this.last_move = time_current;
+
+        // check our input buffer for the next move
+        if (this.input_buffer.length > 0) {
+            log('checking input buffer for movement:');
+            log_input_buffer();
+
+            let key = this.input_buffer.shift();
+            switch (key) {
+                case "w":
+                    if (this.heading != "s") this.heading = "n";
+                    break;
+                case "a":
+                    if (this.heading != "e") this.heading = "w";
+                    break;
+                case "s":
+                    if (this.heading != "n") this.heading = "s";
+                    break;
+                case "d":
+                    if (this.heading != "w") this.heading = "e";
+                    break;
+            }
+        }
+
         this.body.push({ ...this.position });
 
         if (this.body.length > this.body_max_length) {
@@ -65,17 +93,23 @@ class Player {
 
         // check for death
         let death = false;
+
+        // check for edge collision
         if (this.position.x < 1) death = true;
         if (this.position.y < 1) death = true;
         if (this.position.x > 39) death = true;
         if (this.position.y > 39) death = true;
 
+        // check for body collision
         for (var i = 0; i < this.body.length; i++) {
-            if (this.position.x == this.body[i].x && this.position.y == this.body[i].y) {
+            if (
+                this.position.x == this.body[i].x && this.position.y == this.body[i].y
+            ) {
                 death = true;
             }
         }
 
+        // if dead, set scene to game over
         if (death) {
             log("game over!");
             scene = "gameover";
@@ -91,11 +125,34 @@ time_current = hrTime();
 
 addEventListener("keydown", ({ key }) => {
     last_key = key;
-    log(key);
-    if (key == "w" && player.heading != "s" && player.last_heading != 's') player.heading = "n";
-    if (key == "s" && player.heading != "n" && player.last_heading != 'n') player.heading = "s";
-    if (key == "a" && player.heading != "e" && player.last_heading != 'e') player.heading = "w";
-    if (key == "d" && player.heading != "w" && player.last_heading != 'w') player.heading = "e";
+    log("Key pressed: " + key);
+
+    valid_movement_keys = ["w", "a", "s", "d"];
+
+
+    if (valid_movement_keys.includes(key)) {
+        log("valid key pressed: " + key);
+
+        // check if the input buffer is full
+        if (player.input_buffer.length >= player.input_buffer_max_length) {
+            log("input buffer full, not adding key");
+        } else {
+            push_key = false;
+
+            // check if the last key placed in the input buffer is the same as the current key to be pushed
+            if (player.input_buffer.length === 0) {
+                push_key = true;
+            } else if (player.input_buffer[player.input_buffer.length - 1] != key) {
+                push_key = true;
+            }
+
+            if (push_key) {
+                player.input_buffer.push(key);
+                log("pushed key to input buffer: " + key);
+                log_input_buffer();
+            }
+        }
+    }
 });
 
 function animate() {
@@ -148,14 +205,13 @@ function animateGameOver() {
     ctx.fillText(
         "Score: " + player.score,
         canvas.width / 2,
-        base_font_size * 4
+        base_font_size * 4,
     );
-
 
     ctx.fillText(
         "Press [Enter] to Continue",
         canvas.width / 2,
-        base_font_size * 6
+        base_font_size * 6,
     );
 
     if (last_key == "Enter") {
@@ -167,7 +223,6 @@ function animateGameOver() {
 }
 
 function offsetFillRect(x, y, w, h) {
-
     let left_offset = Math.floor(canvas.width / 2 - canvas.block_size * 20);
 
     ctx.fillRect(left_offset + x, y, w, h);
@@ -191,7 +246,7 @@ function animateGame() {
         canvas.block_size * 40,
         0,
         canvas.block_size,
-        canvas.block_size * 40
+        canvas.block_size * 40,
     );
 
     // bottom edge
@@ -199,7 +254,7 @@ function animateGame() {
         0,
         canvas.block_size * 40,
         canvas.block_size * 41,
-        canvas.block_size
+        canvas.block_size,
     );
 
     // move the player
@@ -211,7 +266,7 @@ function animateGame() {
         player.position.x * canvas.block_size,
         player.position.y * canvas.block_size,
         canvas.block_size,
-        canvas.block_size
+        canvas.block_size,
     );
 
     // draw the player body
@@ -222,7 +277,7 @@ function animateGame() {
             player.body[i].x * canvas.block_size,
             player.body[i].y * canvas.block_size,
             canvas.block_size,
-            canvas.block_size
+            canvas.block_size,
         );
     }
 
@@ -232,7 +287,7 @@ function animateGame() {
         food.x * canvas.block_size,
         food.y * canvas.block_size,
         canvas.block_size,
-        canvas.block_size
+        canvas.block_size,
     );
 
     if (last_key == "Enter") {
@@ -265,12 +320,12 @@ function animateTitle() {
     ctx.fillText(
         "A Jack Games Production",
         canvas.width / 2,
-        font_size_title * 2
+        font_size_title * 2,
     );
     ctx.fillText(
         "Press [Enter] to Start and Pause",
         canvas.width / 2,
-        font_size_title * 3
+        font_size_title * 3,
     );
     ctx.drawImage(snakeimg, canvas.width / 2, 100);
 
