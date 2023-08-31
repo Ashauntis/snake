@@ -29,7 +29,6 @@ class Player {
         this.move_delay = 0.2;
         this.body_max_length = 4;
         this.score = 0;
-        this.difficulty = 0.9; // 1 is no speed up, 0.5 is double speed. maybe .9 or .95 is good?
         this.input_buffer = [];
         this.input_buffer_max_length = 3;
     }
@@ -87,7 +86,14 @@ class Player {
         // check for food
         if (this.position.x == food.x && this.position.y == food.y) {
             this.body_max_length += 4;
-            this.move_delay *= this.difficulty;
+            if (canvas.difficulty === 'easy') {
+                this.move_delay *= 0.95;
+            } else if (canvas.difficulty === 'medium') {
+                this.move_delay *= 0.9;
+            } else if (canvas.difficulty === 'hard') {
+                this.move_delay *= 0.5;
+            }
+
             this.score += 1;
             placeFood();
         }
@@ -224,6 +230,12 @@ function animateGameOver() {
     ctx.fillStyle = "white";
 
     ctx.font = Math.floor(base_font_size / 2) + "px PressStart2P";
+
+    ctx.fillText(
+        "Mode: " + canvas.difficulty,
+        canvas.width / 2,
+        base_font_size / 1.5,
+    );
 
     ctx.fillText(
         "Score: " + player.score,
@@ -381,13 +393,38 @@ function animateTitle() {
     fillAndStrokeText("Snake", canvas.width / 2, font_size_title + 4);
 
     ctx.font = font_size_subtitle + "px PressStart2P";
-    fillAndStrokeText(
-        "©️ 1975 Jack Games",
-        canvas.width / 2,
-        font_size_title * 10,
-    );
+    fillAndStrokeText("©️ 1975 Jack Games", canvas.width / 2, font_size_title * 10);
 
-    ctx.textAlign = "center";
+
+    if (last_key == "1") {
+        canvas.difficulty = 'easy';
+    } else if (last_key == "2") {
+        canvas.difficulty = 'medium';
+    } else if (last_key == "3") {
+        canvas.difficulty = 'hard';
+    }
+
+    if (canvas.difficulty === 'easy') {
+        fillAndStrokeText(
+            "*[1] Easy* [2] Medium [3] Hard",
+            canvas.width / 2,
+            font_size_title * 2.25,
+        );
+    } else if (canvas.difficulty === 'medium') {
+        fillAndStrokeText(
+            "[1] Easy *[2] Medium* [3] Hard",
+            canvas.width / 2,
+            font_size_title * 2.25,
+        );
+    } else if (canvas.difficulty === 'hard') {
+        fillAndStrokeText(
+            "[1] Easy [2] Medium *[3] Hard*",
+            canvas.width / 2,
+            font_size_title * 2.25,
+        );
+    }
+
+
 
     fillAndStrokeText(
         "Move",
@@ -433,6 +470,7 @@ function animateTitle() {
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+canvas.difficulty = 'medium';
 
 var tick = 0;
 
