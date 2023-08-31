@@ -163,6 +163,8 @@ addEventListener("keydown", ({ key }) => {
 });
 
 function animate() {
+    tick++;
+
     requestAnimationFrame(animate);
     time_current = hrTime();
     time_delta = time_current - time_last;
@@ -336,15 +338,35 @@ function fillAndStrokeText(text, x, y) {
 }
 
 function animateTitle() {
+
+    // draw the snake image in the center of the screen with a slight transparency
+    ctx.globalAlpha = 0.8;
     ctx.drawImage(snakeimg, canvas.width / 2 - snakeimg.width / 2, canvas.height / 2 - snakeimg.height / 2);
+    ctx.globalAlpha = 1;
 
     var font_size_title = canvas.block_size * 4;
     var font_size_subtitle = canvas.block_size * 2;
 
     ctx.font = font_size_title + "px PressStart2P";
-    ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.strokeStyle = "red";
+
+
+    // create some gradients to use
+    const gradient_stroke = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    const gradient_fill = ctx.createLinearGradient(0, 0, canvas.width, 0);
+
+    gradient_fill.addColorStop("0.0", '#ffd319');
+    gradient_fill.addColorStop("0.5", "#ff901f");
+    gradient_fill.addColorStop("1.0", '#ff901f');
+
+    gradient_stroke.addColorStop("0", "#f222ff");
+    gradient_stroke.addColorStop("1.0", "#8c1eff");
+
+    // Fill with gradient
+    ctx.fillStyle = gradient_fill;
+    ctx.strokeStyle = gradient_stroke;
+    ctx.lineWidth = 2 + Math.sin(tick / 40) * 1;
+
     fillAndStrokeText("Snake", canvas.width / 2, font_size_title + 4);
 
     ctx.font = font_size_subtitle + "px PressStart2P";
@@ -400,6 +422,8 @@ function animateTitle() {
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+
+var tick = 0;
 
 // load a font from url
 var myFont = new FontFace("PressStart2P", "url(./PressStart2P-Regular.ttf)");
