@@ -11,8 +11,8 @@ function hrTime() {
 }
 
 function placeFood() {
-    food.x = 1 + Math.floor(Math.random() * 38);
-    food.y = 1 + Math.floor(Math.random() * 38);
+    food.x = 1 + Math.floor(Math.random() * 39);
+    food.y = 1 + Math.floor(Math.random() * 39);
 }
 
 function log_input_buffer() {
@@ -313,6 +313,17 @@ function animateGame() {
         canvas.block_size,
     );
 
+    // draw lots of food
+    // for (var i = 0; i < 1000; i++) {
+    //     placeFood();
+    //     ctx.fillStyle = "red";
+    //     offsetFillRect(
+    //         food.x * canvas.block_size,
+    //         food.y * canvas.block_size,
+    //         canvas.block_size,
+    //         canvas.block_size,
+    //     );
+    // }
     if (last_key == "Enter") {
         last_key = "";
         scene = "pause";
